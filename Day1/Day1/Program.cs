@@ -8,7 +8,7 @@ internal class Program
     static void Main(string[] args)
     {
         List<int> inputInts = ReadFileToInts("input.txt");
-
+        
         int[] threeLargest = FindThreeLargest(inputInts);
         int sum = 0;
         foreach (int i in threeLargest)
@@ -54,7 +54,7 @@ internal class Program
     public static int[] FindThreeLargest(List<int> inputInts)
     {
         int[] output = new int[3];
-
+        //List.Sort()
         foreach(int num in inputInts)
         {
             if(num > output[2])
