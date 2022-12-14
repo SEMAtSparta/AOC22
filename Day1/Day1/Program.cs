@@ -1,4 +1,6 @@
 ﻿using System.IO;
+using System.Runtime.ExceptionServices;
+
 namespace Day1;
 
 internal class Program
@@ -7,9 +9,13 @@ internal class Program
     {
         List<int> inputInts = ReadFileToInts("input.txt");
 
-        
-        
-        
+        int[] threeLargest = FindThreeLargest(inputInts);
+        int sum = 0;
+        foreach (int i in threeLargest)
+        {
+            sum += i;
+        }
+        Console.WriteLine(sum);       
     }
 
     public static List<int> ReadFileToInts(string fileName)
@@ -48,6 +54,32 @@ internal class Program
     public static int[] FindThreeLargest(List<int> inputInts)
     {
         int[] output = new int[3];
+
+        foreach(int num in inputInts)
+        {
+            if(num > output[2])
+            {
+                if(num > output[1])
+                {
+                    if(num > output[0])
+                    {
+                        output[2] = output[1];
+                        output[1] = output[0];
+                        output[0] = num;
+                    }
+                    else
+                    {
+                        output[2] = output[1];
+                        output[1] = num;
+                    }
+                }
+                else
+                {
+                    output[2] = num;
+                }
+            }
+        }
+        
         return output;
     }
 }
