@@ -42,22 +42,25 @@ public class Program
 
     public static int RPSChosenResult(string player1Choice, string resultOfMatch)
     {
-        int matchResultPoints = 0;
+        int score = 0;
 
         int outcomeOfMatch = 0;
         string[] orderOfRPS = { "A", "B", "C" };
         switch (resultOfMatch)
         {
+            //lose
             case "X":
-                matchResultPoints += 0;
+                score += 0;
                 outcomeOfMatch = 2;
                 break;
+            //draw
             case "Y":
-                matchResultPoints += 3;
+                score += 3;
                 outcomeOfMatch = 0;
                 break;
+            //win
             case "Z":
-                matchResultPoints += 6;
+                score += 6;
                 outcomeOfMatch = 1;
                 break;
             default:
@@ -71,25 +74,25 @@ public class Program
                 nextChoiceIndex = (i + outcomeOfMatch)%3;
             }
         }
-        return nextChoiceIndex + 1 + matchResultPoints;
+        return nextChoiceIndex + 1 + score;
     }
 
     public static int RPSMatch(string player1Choice, string player2Choice)
     {
         
-        int output = 0;
+        int score = 0;
         switch (player2Choice)
         {
             case "X":
-                output += 1;
+                score += 1;
                 player2Choice = "A";
                 break;
             case "Y":
-                output += 2;
+                score += 2;
                 player2Choice = "B";
                 break;
             case "Z":
-                output += 3;
+                score += 3;
                 player2Choice = "C";
                 break;
             default:
@@ -108,15 +111,15 @@ public class Program
         int matchResult = p1ChoiceInt - p2ChoiceInt;
 
         if(matchResult == -1|| matchResult == 2){
-            return output + 6;
+            return score + 6;
         }
         else if(p1ChoiceInt == p2ChoiceInt)
         {
-            return output + 3;
+            return score + 3;
         }
         else
         {
-            return output;
+            return score;
         }
     }
 }
