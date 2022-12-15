@@ -6,6 +6,12 @@ public class Program
 {
     static void Main(string[] args)
     {
+        Part1();
+        Part2();
+    }
+
+    static void Part1()
+    {
         string[] inputStrings = File.ReadAllLines("input.txt");
         int sum = 0;
         foreach (string line in inputStrings)
@@ -13,14 +19,29 @@ public class Program
             var pairArray = SplitLineIntoPair(line);
             if (CheckIfPairContainsPair(pairArray[0].Item1, pairArray[0].Item2, pairArray[1].Item1, pairArray[1].Item2))
             {
-                sum += 1;
+                sum++;
             }
         }
 
-        Console.WriteLine(sum);
+        Console.WriteLine($"The answer to part 1 is: {sum}");
     }
 
-    static (int, int)[] SplitLineIntoPair(string inputString)
+    static void Part2()
+    {
+        string[] inputStrings = File.ReadAllLines("input.txt");
+        int sum = 0;
+        foreach(string line in inputStrings)
+        {
+            var pairArray = SplitLineIntoPair(line);
+            if(CheckIfPairsOverlap(pairArray[0].Item1, pairArray[0].Item2, pairArray[1].Item1, pairArray[1].Item2))
+            {
+                sum++;
+            }
+        }
+        Console.WriteLine($"The answer to part 2 is: {sum}");
+    }
+
+    public static (int, int)[] SplitLineIntoPair(string inputString)
     {
         string[] stringPair = inputString.Split(",");
         var outputArray = new (int, int)[2];
@@ -38,20 +59,17 @@ public class Program
 
     public static bool CheckIfPairContainsPair(int pair1Lower, int pair1Upper, int pair2Lower, int pair2Upper)
     {
-        if (pair1Lower >= pair2Lower)
-        {
-            //pair 2 contains pair 1
-            if (pair1Upper <= pair2Upper)
-            {
-                return true;
-            }
-            else return false;
-        }
-        //pair 1 contains pair 2
-        else if (pair1Upper >= pair2Upper)
-        {
-            return true;
-        }
-        else return false;
+        bool pair1ContainsPair2 = (pair1Lower <= pair2Lower) && (pair1Upper >= pair2Upper);
+        bool pair2ContainsPair1 = (pair1Lower >= pair2Lower) && (pair1Upper <= pair2Upper);
+        return ( pair1ContainsPair2 || pair2ContainsPair1 );
+
+    }
+
+    public static bool CheckIfPairsOverlap(int pair1Lower, int pair1Upper, int pair2Lower, int pair2Upper)
+    {
+        bool pair1StrictlyGreaterThanPair2 = pair1Lower > pair2Upper;
+        bool pair2StrictlyGreaterThanPair1 = pair2Lower > pair1Upper;
+
+        return !(pair1StrictlyGreaterThanPair2 || pair2StrictlyGreaterThanPair1);
     }
 }
