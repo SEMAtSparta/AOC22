@@ -42,39 +42,44 @@ public class Program
 
     public static int RPSChosenResult(string player1Choice, string resultOfMatch)
     {
-        int score = 0;
+        //this variable maps match outcomes: 0 = draw, 1 = win, 2 = loss.
+        //for example where choiceIndex = 1, i.e: "B", the winning result is choiceIndex + 1, 2, i.e. "C"
+        //to prevent index being out of bounds we apply %3
+        int indexModifier = 0;
 
-        int outcomeOfMatch = 0;
-        string[] orderOfRPS = { "A", "B", "C" };
+        int matchOutcomeModifier = 0;
         switch (resultOfMatch)
         {
             //lose
             case "X":
-                score += 0;
-                outcomeOfMatch = 2;
+                matchOutcomeModifier += 0;
+                indexModifier = 2;
                 break;
             //draw
             case "Y":
-                score += 3;
-                outcomeOfMatch = 0;
+                matchOutcomeModifier += 3;
+                indexModifier = 0;
                 break;
             //win
             case "Z":
-                score += 6;
-                outcomeOfMatch = 1;
+                matchOutcomeModifier += 6;
+                indexModifier = 1;
                 break;
             default:
                 break;
         }
+
+        string[] orderOfRPS = { "A", "B", "C" };
+
         int nextChoiceIndex = 0;
         for(int i = 0; i < orderOfRPS.Length; i++)
         {
             if (orderOfRPS[i] == player1Choice)
             {
-                nextChoiceIndex = (i + outcomeOfMatch)%3;
+                nextChoiceIndex = (i + indexModifier)%3;
             }
         }
-        return nextChoiceIndex + 1 + score;
+        return nextChoiceIndex + 1 + matchOutcomeModifier;
     }
 
     public static int RPSMatch(string player1Choice, string player2Choice)
