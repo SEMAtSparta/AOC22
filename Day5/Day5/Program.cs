@@ -6,6 +6,8 @@ public class Program
     static void Main(string[] args)
     {
         Part1();
+        Console.WriteLine("");
+        Part2();
     }
 
     public static void Part1()
@@ -21,9 +23,26 @@ public class Program
 
         foreach (Stack<string> pile in arrayOfPiles)
         {
-            Console.WriteLine(pile.Peek());
+            Console.Write(pile.Peek());
         }
     }
+    public static void Part2()
+    {
+        string[] input = File.ReadAllLines("input.txt");
+        List<Instruction> listOfInstructions = new();
+        Stack<string>[] arrayOfPiles = ParseInputToStackAndInstructions(input, 9, 8, out listOfInstructions);
+
+        foreach (Instruction i in listOfInstructions)
+        {
+            MoveMultipleCargo(i.numberOfCrates, i.initialLocation, i.targetLocation, ref arrayOfPiles);
+        }
+
+        foreach (Stack<string> pile in arrayOfPiles)
+        {
+            Console.Write(pile.Peek());
+        }
+    }
+
     static Stack<string>[] ParseInputToStackAndInstructions(string[] inputStrings, int numberOfPiles, int maxSizeOfStack, out List<Instruction> instructions)
     {
         Stack<string>[] arrayOfPiles = ParseStringToArrayOfPiles(inputStrings, maxSizeOfStack);
@@ -63,7 +82,7 @@ public class Program
             arrayOfPiles[i] = new Stack<string>();
         }
 
-        for (int i = 0; i < maxSizeOfStack; i++)
+        for (int i = maxSizeOfStack; i >= 0; i--)
         {
             //sort out the crates
             for (int j = 0; j < inputStrings[i].Length; j += 4)
@@ -86,6 +105,20 @@ public class Program
         {
             string crate = arrayOfPiles[initialLocation].Pop();
             arrayOfPiles[targetLocation].Push(crate);
+        }
+    }
+
+    public static void MoveMultipleCargo(int numberOfCrates, int initialLocation, int targetLocation, ref Stack<string>[] arrayOfPiles)
+    {
+        Stack<string> tempStack = new();
+        for (int i = 0; i < numberOfCrates; i++)
+        {
+            string crate = arrayOfPiles[initialLocation].Pop();
+            tempStack.Push(crate);
+        }
+        for(int i = 0; i < numberOfCrates; i++)
+        {
+            arrayOfPiles[targetLocation].Push(tempStack.Pop());
         }
     }
 }
