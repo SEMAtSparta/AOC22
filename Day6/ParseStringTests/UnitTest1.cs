@@ -13,10 +13,11 @@ public class Tests
     [TestCase("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 14, 29)]
     [TestCase("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 14, 26)]
 
-    
-
     public void GivenString_FindStartOfPacketMarker_ReturnsPosition(string input, int sizeOfMarker, int expectedResult)
     {
+
         Assert.That(Program.FindStartOfPacketMarker(input, sizeOfMarker), Is.EqualTo(expectedResult));
     }
+
+
 }

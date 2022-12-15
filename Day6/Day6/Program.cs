@@ -9,8 +9,6 @@ public class Program
         string[] inputString = File.ReadAllLines("input.txt");
         Console.WriteLine(FindStartOfPacketMarker(inputString[0], 4));
         Console.WriteLine(FindStartOfPacketMarker(inputString[0], 14));
-
-
     }
 
     public static int FindStartOfPacketMarker(string dataStreamBuffer, int sizeOfMarker)
@@ -36,7 +34,8 @@ public class Program
     public static bool AreStackContentsDifferent(Queue<char> packet)
     {
         Queue<char> packetCopy = new Queue<char>(packet);
-        for(int i = 0; i < packetCopy.Count+1; i++)
+        int count = packetCopy.Count;
+        for (int i = 0; i < count; i++)
         {
             char c = packetCopy.Dequeue();
             foreach(char item in packetCopy)
