@@ -1,55 +1,121 @@
-﻿namespace Day7
+﻿namespace Day7;
+
+public class Program
 {
-    internal class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello, World!");
-        }
-
-        public string StringToInstruction(string inputString)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string StringToDirectory(string inputString)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int StringToData(string inputString)
-        {
-            throw new NotImplementedException();
-        }
-
+        Console.WriteLine("Hello, World!");
     }
 
-    struct Folder
+    //stack of accessed directories
+    //cd .. pops the stack
+    //active directory is accessed by peek
+    //cd XXX pushes xxx to top of stack
+
+    public static LineType GetLineType(string inputString)
     {
-        string Name { get; }
-        int Data = 0;
-        List<Folder> Children { get; }
-
-        public Folder(string folderName)
+        if (inputString.StartsWith('$'))
         {
-            Name = folderName;
-            Children = new List<Folder>();
+            return LineType.INSTRUCTION;
+        }
+        else if (inputString.StartsWith("dir"))
+        {
+            return LineType.DIRECTORY;
+        }
+        else return LineType.DATA;
+    }
+
+    public static void StringToInstruction(string inputString, Folder currentDirectory)
+    {
+        string[] splitInstruction = inputString.Split(" ");
+        if (splitInstruction[1] == "ls")
+        {
+            return;
         }
 
-        public void AddChild(Folder node)
-        {
-            Children.Add(node);
-        }
+        string targetDirectory = splitInstruction[2];
 
-        public int GetValueOfChildren()
+        if (targetDirectory == "..")
         {
-            int totalSize = 0;
-            foreach(Folder child in Children)
+            MoveOutOfFolder();
+        }
+        else
+        {
+            MoveIntoFolder(currentDirectory.GetChildWithName(targetDirectory));
+        }
+    }
+
+    public static Folder StringToDirectory(string inputString)
+    {
+        string newFolderName = inputString.Split(" ")[1];
+        Folder newFolder = new Folder(newFolderName);
+        return newFolder;
+    }
+
+    public static int StringToData(string inputString)
+    {
+        int newData = Int32.Parse(inputString.Split(" ")[0]);
+        return newData;
+    }
+
+    public static void MoveIntoFolder(Folder folder)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static void MoveOutOfFolder()
+    {
+        throw new NotImplementedException();
+    }
+
+}
+
+public enum LineType
+{
+    INSTRUCTION, DIRECTORY, DATA
+}
+
+public struct Folder
+{
+    public string Name { get; set; }
+    int Data = 0;
+    List<Folder> Children;
+
+    public Folder(string folderName)
+    {
+        Name = folderName;
+        Children = new List<Folder>();
+    }
+
+    public void AddChild(Folder node)
+    {
+        Children.Add(node);
+    }
+    
+    public void AddData(int data)
+    {
+        Data += data;
+    }
+
+    public Folder GetChildWithName(string name)
+    {
+        foreach(Folder child in Children)
+        {
+            if(child.Name == name)
             {
-                totalSize += child.Data;
-                totalSize += child.GetValueOfChildren();
+                return child;
             }
-            return totalSize;
         }
+        throw new ArgumentException($"No folder exists with {name}");
+    }
+
+    public int GetValueOfChildren()
+    {
+        int totalSize = Data;
+        foreach(Folder child in Children)
+        {
+            totalSize += child.GetValueOfChildren();
+        }
+        return totalSize;
     }
 }
