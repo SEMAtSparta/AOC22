@@ -1,16 +1,61 @@
-﻿namespace Day7;
+﻿using System.Security.AccessControl;
+
+namespace Day7;
 
 public class Program
 {
+    
     static void Main(string[] args)
     {
-        Console.WriteLine("Hello, World!");
+        ControlFlow("input.txt");
     }
 
     //stack of accessed directories
     //cd .. pops the stack
     //active directory is accessed by peek
     //cd XXX pushes xxx to top of stack
+
+    public static void ControlFlow(string fileName)
+    {
+        string[] inputStrings = File.ReadAllLines(fileName);
+        Stack<Folder> directoryHistory = new();
+        directoryHistory.Push(new Folder(" "));
+        Folder rootFolder = new("/");
+        directoryHistory.Peek().AddChild(rootFolder);
+
+        foreach(string line in inputStrings)
+        {
+            LineType lineType = GetLineType(line);
+
+            switch (lineType)
+            {
+                case LineType.INSTRUCTION:
+                    MoveInstruction moveType = StringToInstruction(line, out string targetDirectory);
+                    if(moveType == MoveInstruction.MOVEOUT)
+                    {
+                        directoryHistory.Pop();
+                    }
+                    else if(moveType == MoveInstruction.MOVEIN)
+                    {
+                        Folder targetFolder = directoryHistory.Peek().GetChildWithName(targetDirectory);
+                        directoryHistory.Push(targetFolder);
+                    }
+                    break;
+
+                case LineType.DIRECTORY:
+                    Folder newFolder = StringToNewDirectory(line);
+                    directoryHistory.Peek().AddChild(newFolder);
+                    break;
+
+                case LineType.DATA:
+                    int newData = StringToData(line);
+                    Folder currentFolder = directoryHistory.Peek();
+                    currentFolder.AddData(newData);
+                    break;
+            }
+        }
+        Console.WriteLine(rootFolder.GetValueOfChildren());
+    }
 
     public static LineType GetLineType(string inputString)
     {
@@ -25,30 +70,33 @@ public class Program
         else return LineType.DATA;
     }
 
-    public static void StringToInstruction(string inputString, Folder currentDirectory)
+    public static MoveInstruction StringToInstruction(string inputString, out string targetDirectory)
     {
         string[] splitInstruction = inputString.Split(" ");
+        targetDirectory = " ";
+
+
         if (splitInstruction[1] == "ls")
         {
-            return;
+            return MoveInstruction.EMPTY;
         }
 
-        string targetDirectory = splitInstruction[2];
+        targetDirectory = splitInstruction[2];
 
         if (targetDirectory == "..")
         {
-            MoveOutOfFolder();
+            return MoveInstruction.MOVEOUT;
         }
         else
         {
-            MoveIntoFolder(currentDirectory.GetChildWithName(targetDirectory));
+            return MoveInstruction.MOVEIN;
         }
     }
 
-    public static Folder StringToDirectory(string inputString)
+    public static Folder StringToNewDirectory(string inputString)
     {
         string newFolderName = inputString.Split(" ")[1];
-        Folder newFolder = new Folder(newFolderName);
+        Folder newFolder = new(newFolderName);
         return newFolder;
     }
 
@@ -57,17 +105,6 @@ public class Program
         int newData = Int32.Parse(inputString.Split(" ")[0]);
         return newData;
     }
-
-    public static void MoveIntoFolder(Folder folder)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static void MoveOutOfFolder()
-    {
-        throw new NotImplementedException();
-    }
-
 }
 
 public enum LineType
@@ -75,10 +112,15 @@ public enum LineType
     INSTRUCTION, DIRECTORY, DATA
 }
 
+public enum MoveInstruction
+{
+    MOVEIN,MOVEOUT, EMPTY
+}
+
 public struct Folder
 {
     public string Name { get; set; }
-    int Data = 0;
+    public int Data = 0;
     List<Folder> Children;
 
     public Folder(string folderName)

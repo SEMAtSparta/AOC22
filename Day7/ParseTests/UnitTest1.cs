@@ -4,11 +4,16 @@ namespace ParseTestsApp;
 public class Tests
 {
     Folder exampleFolder;
+    Folder exampleFolder2;
+    Stack<Folder> directoryStack;
     [SetUp]
 
     public void SetUp()
     {
         exampleFolder = new Folder("ExampleFolder");
+        exampleFolder2 = new Folder("ExampleFolder2");
+        directoryStack = new Stack<Folder>();
+        directoryStack.Push(exampleFolder);
     }
         //arrange
         //act
@@ -68,7 +73,7 @@ public class Tests
         var inputString = "dir ExampleFolder";
         var expectedValue = "ExampleFolder";
         //act
-        var output = Program.StringToDirectory(inputString).Name;
+        var output = Program.StringToNewDirectory(inputString).Name;
         //assert
         Assert.That(output, Is.EqualTo(expectedValue));
     }
