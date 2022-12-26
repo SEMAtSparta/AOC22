@@ -17,13 +17,14 @@ public class Program
 
     public static void ControlFlow(string fileName)
     {
-        string[] inputStrings = File.ReadAllLines(fileName);
         Stack<Folder> directoryHistory = new();
-        directoryHistory.Push(new Folder(" "));
         Folder rootFolder = new("/");
-        directoryHistory.Peek().AddChild(rootFolder);
+        Folder preRootFolder = new(" ");
+        preRootFolder.AddChild(rootFolder);
+        directoryHistory.Push(preRootFolder);
 
-        foreach(string line in inputStrings)
+        string[] inputStrings = File.ReadAllLines(fileName);
+        foreach (string line in inputStrings)
         {
             LineType lineType = GetLineType(line);
 
@@ -49,8 +50,9 @@ public class Program
 
                 case LineType.DATA:
                     int newData = StringToData(line);
-                    Folder currentFolder = directoryHistory.Peek();
+                    Folder currentFolder = directoryHistory.Pop();
                     currentFolder.AddData(newData);
+                    directoryHistory.Push(currentFolder);
                     break;
             }
         }
@@ -159,5 +161,10 @@ public struct Folder
             totalSize += child.GetValueOfChildren();
         }
         return totalSize;
+    }
+
+    public override string ToString()
+    {
+        return $"{Name}: {Data}";
     }
 }

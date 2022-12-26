@@ -3,21 +3,53 @@ namespace ParseTestsApp;
 
 public class Tests
 {
-    Folder exampleFolder;
-    Folder exampleFolder2;
-    Stack<Folder> directoryStack;
+    List<Folder> exampleFolders;
+    int[] sizeOfFolders;
+
     [SetUp]
 
     public void SetUp()
     {
-        exampleFolder = new Folder("ExampleFolder");
-        exampleFolder2 = new Folder("ExampleFolder2");
-        directoryStack = new Stack<Folder>();
-        directoryStack.Push(exampleFolder);
+        sizeOfFolders = new int[5] { 25, 21, 22, 0, 1 };
+        exampleFolders = new List<Folder>();
+        int index = 0;
+        foreach(int i in sizeOfFolders)
+        {
+            Folder f = new Folder(i.ToString());
+            f.AddData(i);
+            exampleFolders.Add(f);
+            if(index > 0)
+            {
+                exampleFolders[index - 1].AddChild(exampleFolders[index]);
+            }
+            index++;
+        }
     }
-        //arrange
-        //act
-        //assert
+    //arrange
+    //act
+    //assert
+
+    [Test]
+    public void GivenInt_AddData_IncreasesFolderData()
+    {
+        int expected = 50;
+        Folder f = new();
+        f.AddData(expected);
+
+        Assert.That(expected, Is.EqualTo(f.Data));
+
+    }
+
+
+    [Test]
+
+    public void GivenFolderWithChildren_GetValueOfChildren_ReturnsSumOfFolderSizes()
+    {
+        int sum = exampleFolders[0].GetValueOfChildren();
+        int expectedResult = sizeOfFolders.Sum();
+
+        Assert.That(sum, Is.EqualTo(expectedResult));
+    }
 
     [Test]
     public void GivenStringBeginningDollarSign_GetLineType_ReturnsInstruction()
