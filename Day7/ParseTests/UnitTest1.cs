@@ -20,7 +20,8 @@ public class Tests
             exampleFolders.Add(f);
             if(index > 0)
             {
-                exampleFolders[index - 1].AddChild(exampleFolders[index]);
+                Folder newf = exampleFolders[index];
+                exampleFolders[index - 1].AddChild(ref newf);
             }
             index++;
         }

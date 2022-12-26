@@ -7,56 +7,95 @@ public class Program
     
     static void Main(string[] args)
     {
-        ControlFlow("input.txt");
+        Folder rootFolder = PopulateFolders("input.txt");
+
+        List<Folder> allFolders = rootFolder.GetSubfolders();
+
+        Part2(allFolders, rootFolder.GetValueOfChildren());
     }
 
-    //stack of accessed directories
-    //cd .. pops the stack
-    //active directory is accessed by peek
-    //cd XXX pushes xxx to top of stack
 
-    public static void ControlFlow(string fileName)
+    static void Part1(List<Folder> allFolders)
     {
-        Stack<Folder> directoryHistory = new();
-        Folder rootFolder = new("/");
-        Folder preRootFolder = new(" ");
-        preRootFolder.AddChild(rootFolder);
-        directoryHistory.Push(preRootFolder);
-
-        string[] inputStrings = File.ReadAllLines(fileName);
-        foreach (string line in inputStrings)
+        int sum = 0;
+        foreach (Folder folder in allFolders)
         {
-            LineType lineType = GetLineType(line);
-
-            switch (lineType)
+            int sizeOfFolder = folder.GetValueOfChildren();
+            if (sizeOfFolder < 100_000)
             {
-                case LineType.INSTRUCTION:
-                    MoveInstruction moveType = StringToInstruction(line, out string targetDirectory);
-                    if(moveType == MoveInstruction.MOVEOUT)
-                    {
-                        directoryHistory.Pop();
-                    }
-                    else if(moveType == MoveInstruction.MOVEIN)
-                    {
-                        Folder targetFolder = directoryHistory.Peek().GetChildWithName(targetDirectory);
-                        directoryHistory.Push(targetFolder);
-                    }
-                    break;
-
-                case LineType.DIRECTORY:
-                    Folder newFolder = StringToNewDirectory(line);
-                    directoryHistory.Peek().AddChild(newFolder);
-                    break;
-
-                case LineType.DATA:
-                    int newData = StringToData(line);
-                    Folder currentFolder = directoryHistory.Pop();
-                    currentFolder.AddData(newData);
-                    directoryHistory.Push(currentFolder);
-                    break;
+                sum += sizeOfFolder;
             }
         }
-        Console.WriteLine(rootFolder.GetValueOfChildren());
+        Console.WriteLine(sum);
+    }
+
+    static void Part2(List<Folder> allFolders, int sizeOfFileSystem)
+    {
+        int maxCapacity = 70_000_000;
+        int requiredSpace = 30_000_000;
+        int availableSpace = maxCapacity - sizeOfFileSystem;
+        int threshold = requiredSpace - availableSpace;
+        List<int> sizesOfFolders = new();
+        foreach (Folder folder in allFolders) 
+        {
+            int sizeOfFolder = folder.GetValueOfChildren();
+            if(sizeOfFolder >= threshold)
+            {
+                sizesOfFolders.Add(sizeOfFolder);
+            }
+        }
+        sizesOfFolders.Sort();
+        Console.WriteLine($"Solution for part 2: {sizesOfFolders[0]}");
+    }
+
+    public static Folder PopulateFolders(string fileName)
+    {
+        Stack<Folder> directoryHistory = new();
+        List<string> inputStrings = File.ReadAllLines(fileName).ToList();
+        inputStrings.RemoveAt(0);
+        Folder rootFolder = new("/");
+        directoryHistory.Push(rootFolder);
+
+        foreach (string line in inputStrings)
+        {
+            Folder currentFolder = directoryHistory.Pop();
+
+            LineType lineType = GetLineType(line);
+
+            if(lineType == LineType.INSTRUCTION)
+            {
+                MoveInstruction moveInstruction = StringToInstruction(line, out string targetDirectory);
+                if(moveInstruction == MoveInstruction.MOVEIN)
+                {
+                    Folder targetChild = currentFolder.GetChildWithName(targetDirectory);
+                    directoryHistory.Push(currentFolder);
+                    currentFolder = targetChild;
+                }
+                else if(moveInstruction == MoveInstruction.MOVEOUT)
+                {
+                    currentFolder = directoryHistory.Pop();
+                }
+            }
+            else if(lineType == LineType.DIRECTORY)
+            {
+                Folder newFolder = StringToNewDirectory(line);
+                currentFolder.AddChild(newFolder);
+            }
+            else if(lineType == LineType.DATA)
+            {
+                int data = StringToData(line);
+                currentFolder.AddData(data);
+            }
+
+            directoryHistory.Push(currentFolder);
+
+        }
+
+        while(directoryHistory.Count > 1)
+        {
+            directoryHistory.Pop();
+        }
+        return directoryHistory.Pop();
     }
 
     public static LineType GetLineType(string inputString)
@@ -119,7 +158,7 @@ public enum MoveInstruction
     MOVEIN,MOVEOUT, EMPTY
 }
 
-public struct Folder
+public class Folder
 {
     public string Name { get; set; }
     public int Data = 0;
@@ -150,7 +189,7 @@ public struct Folder
                 return child;
             }
         }
-        throw new ArgumentException($"No folder exists with {name}");
+        throw new ArgumentException($"No folder exists with name: {name}");
     }
 
     public int GetValueOfChildren()
@@ -161,6 +200,17 @@ public struct Folder
             totalSize += child.GetValueOfChildren();
         }
         return totalSize;
+    }
+
+    public List<Folder> GetSubfolders()
+    {
+        List<Folder> output = new();
+        foreach(Folder child in Children)
+        {
+            output.Add(child);
+            output.AddRange(child.GetSubfolders());
+        }
+        return output;
     }
 
     public override string ToString()
