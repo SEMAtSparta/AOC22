@@ -48,7 +48,25 @@ public class Tests
             "35390"
         };
         List<int[]> ints = Program.StringArrayTo2DInts(input);
-        bool result = Program.CheckVisibility(ints, targetX, targetY);
+        bool result = Program.CheckIfTreeIsVisible(ints, targetX, targetY);
         Assert.That(result, Is.EqualTo(expectedResult));
+    }
+
+    [Ignore("Not yet implemented methods")]
+    [TestCase(1,2,4)]
+    [TestCase(3,2,8)]
+    public void VisibilityFromTreeTest(int targetX, int targetY, int expectedResults)
+    {
+        string[] input = {
+            "30373",
+            "25512",
+            "65332",
+            "33549",
+            "35390"
+        };
+
+        List<int[]> ints = Program.StringArrayTo2DInts(input);
+        int output = Program.VisibilityFromTree(targetX, targetY, ints);
+        Assert.That(output, Is.EqualTo(expectedResults));
     }
 }

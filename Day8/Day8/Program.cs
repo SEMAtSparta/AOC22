@@ -31,30 +31,37 @@ public class Program
 
         return output;
     }
+    public static int VisibilityFromTree(int targetX, int targetY, List<int[]> input2D)
+    {
+        int[] visibilityByDirection = new int[4];
+
+        return visibilityByDirection[0] * visibilityByDirection[1] * visibilityByDirection[2] * visibilityByDirection[3];
+    }
 
     public static int FindVisibleTrees(List<int[]> input2D)
     {
-        int sum = (input2D.Count * 2) + ((input2D[0].Length - 2) * 2);
+        //outer edges - 4 so we don't double count corners
+        int sum = (input2D.Count * 2) + (input2D[0].Length * 2) - 4;
         for(int col = 1; col < input2D.Count-1; col++)
         {
             for(int row = 1; row < input2D[0].Length-1; row++)
             {
-                sum += CheckVisibility(input2D, row, col) ? 1 : 0;
+                sum += CheckIfTreeIsVisible(input2D, row, col) ? 1 : 0;
             }
         }
 
         return sum;
     }
 
-    public static bool CheckVisibility(List<int[]> input2D, int row, int col)
+    public static bool CheckIfTreeIsVisible(List<int[]> input2D, int row, int col)
     {
         bool[] visibleFromDirections = new bool[4];
         int target = input2D[col][row];
 
-        visibleFromDirections[0] = CheckOneDirection(input2D, target, 0, col, true, row);
-        visibleFromDirections[1] = CheckOneDirection(input2D, target, col+1, input2D.Count, true, row);
-        visibleFromDirections[2] = CheckOneDirection(input2D, target, 0, row, false, col);
-        visibleFromDirections[3] = CheckOneDirection(input2D, target, row+1, input2D[col].Length, true, col);
+        visibleFromDirections[0] = CheckIfTreeIsVisibleOneDirection(input2D, target, 0, col, true, row);
+        visibleFromDirections[1] = CheckIfTreeIsVisibleOneDirection(input2D, target, col+1, input2D.Count, true, row);
+        visibleFromDirections[2] = CheckIfTreeIsVisibleOneDirection(input2D, target, 0, row, false, col);
+        visibleFromDirections[3] = CheckIfTreeIsVisibleOneDirection(input2D, target, row+1, input2D[col].Length, false, col);
         
         foreach(bool b in visibleFromDirections)
         {
@@ -63,11 +70,11 @@ public class Program
         return false;
     }
 
-    public static bool CheckOneDirection(List<int[]> input2D, int target, int start, int end, bool column, int fixedDimension)
+    public static bool CheckIfTreeIsVisibleOneDirection(List<int[]> input2D, int target, int start, int end, bool isColumn, int fixedDimension)
     {
         for (int i = start; i < end; i++)
         {
-            int tree = column ? input2D[i][fixedDimension] : input2D[fixedDimension][i];
+            int tree = isColumn ? input2D[i][fixedDimension] : input2D[fixedDimension][i];
             if (tree >= target)
             {
                 return false;
