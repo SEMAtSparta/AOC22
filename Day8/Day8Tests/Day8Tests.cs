@@ -52,9 +52,8 @@ public class Tests
         Assert.That(result, Is.EqualTo(expectedResult));
     }
 
-    [Ignore("Not yet implemented methods")]
-    [TestCase(1,2,4)]
-    [TestCase(3,2,8)]
+    [TestCase(2,1,4)]
+    [TestCase(2,3,8)]
     public void VisibilityFromTreeTest(int targetX, int targetY, int expectedResults)
     {
         string[] input = {

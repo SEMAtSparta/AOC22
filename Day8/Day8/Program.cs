@@ -6,7 +6,19 @@ public class Program
     {
         string[] inputStrings = File.ReadAllLines("input.txt");
         List<int[]> input2DArray = StringArrayTo2DInts(inputStrings);
-        Console.WriteLine(FindVisibleTrees(input2DArray)); 
+
+        int largest = 0;
+        for (int i = 0; i < input2DArray.Count; i++)
+        {
+            for(int j = 0; j < input2DArray[i].Length; j++)
+            {
+                int x = VisibilityFromTree(j, i, input2DArray);
+
+                largest = x > largest ? x : largest;
+            }
+        }
+        Console.WriteLine(FindVisibleTrees(input2DArray));
+        Console.WriteLine(largest);
     }
 
     public static List<int[]> StringArrayTo2DInts(string[] inputStrings)
@@ -33,9 +45,82 @@ public class Program
     }
     public static int VisibilityFromTree(int targetX, int targetY, List<int[]> input2D)
     {
-        int[] visibilityByDirection = new int[4];
+        int sizeOfTree = input2D[targetY][targetX];
+        int[] visibilityByDirection = VisibilityFromTreeInDirections(sizeOfTree, targetX, targetY, input2D);
 
-        return visibilityByDirection[0] * visibilityByDirection[1] * visibilityByDirection[2] * visibilityByDirection[3];
+        int output = visibilityByDirection[0] * visibilityByDirection[1] * visibilityByDirection[2] * visibilityByDirection[3];
+        return output;
+    }
+
+    public static int[] VisibilityFromTreeInDirections(int sizeOfTree, int targetX, int targetY, List<int[]> input2D)
+    {
+        int[] output = new int[4];
+
+        int index = targetY - 1 < 0 ? 0 : targetY - 1;
+        int upperBound = 0;
+        int sum = 0;
+
+        do
+        {
+            sum++;
+            if (input2D[index][targetX] >= sizeOfTree)
+            {
+                break;
+            }
+            index--;
+        }
+        while (index > upperBound);
+        output[0] = sum;
+
+        index = targetY + 1 == input2D.Count ? targetY : targetY + 1;
+        upperBound = input2D.Count;
+        sum = 0;
+
+        do
+        {
+            sum++;
+            if (input2D[index][targetX] >= sizeOfTree)
+            {
+                break;
+            }
+            index++;
+        }
+        while (index < upperBound) ;
+        output[1] = sum;
+
+        index = targetX - 1 < 0 ? 0 : targetX - 1;
+        upperBound = 0;
+        sum = 0;
+
+        do
+        {
+            sum++;
+            if (input2D[targetY][index] >= sizeOfTree)
+            {
+                break;
+            }
+            index--;
+        }
+        while (index > upperBound) ;
+        output[2] = sum;
+
+        index = targetX + 1 == input2D[0].Length ? targetX : targetX + 1;
+        upperBound = input2D[0].Length;
+        sum = 0;
+
+        do
+        {
+            sum++;
+            if (input2D[targetY][index] >= sizeOfTree)
+            {
+                break;
+            }
+            index++;
+        }
+        while (index < upperBound) ;
+        output[3] = sum;
+
+        return output;
     }
 
     public static int FindVisibleTrees(List<int[]> input2D)
@@ -81,5 +166,13 @@ public class Program
             }
         }
         return true;
+    }
+
+    public enum Cardinal
+    {
+        NORTH,
+        SOUTH,
+        EAST,
+        WEST
     }
 }
