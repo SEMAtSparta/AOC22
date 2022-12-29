@@ -12,7 +12,7 @@ public class Program
         {
             for(int j = 0; j < input2DArray[i].Length; j++)
             {
-                int x = VisibilityFromTree(j, i, input2DArray);
+                int x = VisibilityScoreFromTree(j, i, input2DArray);
 
                 largest = x > largest ? x : largest;
             }
@@ -43,19 +43,19 @@ public class Program
 
         return output;
     }
-    public static int VisibilityFromTree(int targetX, int targetY, List<int[]> input2D)
+    public static int VisibilityScoreFromTree(int targetX, int targetY, List<int[]> input2D)
     {
-        int sizeOfTree = input2D[targetY][targetX];
-        int[] visibilityByDirection = VisibilityFromTreeInDirections(sizeOfTree, targetX, targetY, input2D);
+        int tree = input2D[targetY][targetX];
+        int[] visibilityByDirection = VisibilityFromTreeInAllDirections(tree, targetX, targetY, input2D);
 
-        int output = visibilityByDirection[0] * visibilityByDirection[1] * visibilityByDirection[2] * visibilityByDirection[3];
-        return output;
+        return visibilityByDirection[0] * visibilityByDirection[1] * visibilityByDirection[2] * visibilityByDirection[3];
     }
 
-    public static int[] VisibilityFromTreeInDirections(int sizeOfTree, int targetX, int targetY, List<int[]> input2D)
+    public static int[] VisibilityFromTreeInAllDirections(int tree, int targetX, int targetY, List<int[]> input2D)
     {
         int[] output = new int[4];
 
+        //North
         int index = targetY - 1 < 0 ? 0 : targetY - 1;
         int upperBound = 0;
         int sum = 0;
@@ -63,15 +63,14 @@ public class Program
         do
         {
             sum++;
-            if (input2D[index][targetX] >= sizeOfTree)
-            {
-                break;
-            }
+            if (input2D[index][targetX] >= tree) break;
             index--;
         }
         while (index > upperBound);
+
         output[0] = sum;
 
+        //South
         index = targetY + 1 == input2D.Count ? targetY : targetY + 1;
         upperBound = input2D.Count;
         sum = 0;
@@ -79,15 +78,14 @@ public class Program
         do
         {
             sum++;
-            if (input2D[index][targetX] >= sizeOfTree)
-            {
-                break;
-            }
+            if (input2D[index][targetX] >= tree) break;
             index++;
         }
-        while (index < upperBound) ;
+        while (index < upperBound);
+
         output[1] = sum;
 
+        //West
         index = targetX - 1 < 0 ? 0 : targetX - 1;
         upperBound = 0;
         sum = 0;
@@ -95,15 +93,14 @@ public class Program
         do
         {
             sum++;
-            if (input2D[targetY][index] >= sizeOfTree)
-            {
-                break;
-            }
+            if (input2D[targetY][index] >= tree) break;
             index--;
         }
         while (index > upperBound) ;
+
         output[2] = sum;
 
+        //East
         index = targetX + 1 == input2D[0].Length ? targetX : targetX + 1;
         upperBound = input2D[0].Length;
         sum = 0;
@@ -111,13 +108,11 @@ public class Program
         do
         {
             sum++;
-            if (input2D[targetY][index] >= sizeOfTree)
-            {
-                break;
-            }
+            if (input2D[targetY][index] >= tree) break;
             index++;
         }
-        while (index < upperBound) ;
+        while (index < upperBound);
+
         output[3] = sum;
 
         return output;

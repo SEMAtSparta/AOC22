@@ -65,7 +65,7 @@ public class Tests
         };
 
         List<int[]> ints = Program.StringArrayTo2DInts(input);
-        int output = Program.VisibilityFromTree(targetX, targetY, ints);
+        int output = Program.VisibilityScoreFromTree(targetX, targetY, ints);
         Assert.That(output, Is.EqualTo(expectedResults));
     }
 }
