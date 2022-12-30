@@ -15,7 +15,7 @@ public class Tests
             "35390"
         };
 
-        List<int[]> ints = Program.StringArrayTo2DInts(input);
+        int[][] ints = Program.StringArrayTo2DInts(input);
         Assert.That(ints[0][2], Is.EqualTo(3));
         Assert.That(ints[2][1], Is.EqualTo(5));
         Assert.That(ints[4][3], Is.EqualTo(9));   
@@ -31,7 +31,7 @@ public class Tests
             "33549",
             "35390"
         };
-        List<int[]> ints = Program.StringArrayTo2DInts(input);
+        int[][] ints = Program.StringArrayTo2DInts(input);
         int result = Program.FindVisibleTrees(ints);
         Assert.That(result, Is.EqualTo(21));
     }
@@ -47,13 +47,17 @@ public class Tests
             "33549",
             "35390"
         };
-        List<int[]> ints = Program.StringArrayTo2DInts(input);
+        int[][] ints = Program.StringArrayTo2DInts(input);
         bool result = Program.CheckIfTreeIsVisible(ints, targetX, targetY);
         Assert.That(result, Is.EqualTo(expectedResult));
     }
 
+    [TestCase(0, 0, 4)]
+    [TestCase(0, 4, 1)]
     [TestCase(2,1,4)]
     [TestCase(2,3,8)]
+    [TestCase(4,0,3)]
+    [TestCase(4,4,1)]
     public void VisibilityFromTreeTest(int targetX, int targetY, int expectedResults)
     {
         string[] input = {
@@ -64,7 +68,7 @@ public class Tests
             "35390"
         };
 
-        List<int[]> ints = Program.StringArrayTo2DInts(input);
+        int[][] ints = Program.StringArrayTo2DInts(input);
         int output = Program.VisibilityScoreFromTree(targetX, targetY, ints);
         Assert.That(output, Is.EqualTo(expectedResults));
     }
