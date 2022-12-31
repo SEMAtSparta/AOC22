@@ -92,6 +92,7 @@ public class Program
                 if (t >= tree) break;
             }
         }
+
         if (treeLocation == trees.Length - 1)
         {
             sumAfter = 1;
