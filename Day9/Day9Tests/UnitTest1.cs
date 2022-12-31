@@ -26,7 +26,7 @@ public class Tests
     public void GivenInstructions_FindsVisitedPositions()
     {
 
-        List<Vector2> visitedPositions = Program.Simulate(knot, instructions);
+        HashSet<Vector2> visitedPositions = Program.Simulate(knot, instructions);
         int result = visitedPositions.Count;
 
         Assert.That(result, Is.EqualTo(13));

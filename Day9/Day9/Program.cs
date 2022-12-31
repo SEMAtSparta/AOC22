@@ -28,7 +28,7 @@ public class Program
         return Simulate(knot, instructions).Count;
     }
 
-    public static List<Vector2> Simulate(Knot knot, List<Vector2> instructions)
+    public static HashSet<Vector2> Simulate(Knot knot, List<Vector2> instructions)
     {
         foreach(Vector2 instruction in instructions)
         {
@@ -44,13 +44,13 @@ public class Knot
     public Vector2 HeadPosition { get; set; }
     public Vector2 TailPosition { get; set; }
 
-    public List<Vector2> VisitedPositions { get; }
+    public HashSet<Vector2> VisitedPositions { get; }
 
     public Knot()
     {
         HeadPosition = new Vector2(0, 0);
         TailPosition = new Vector2(0, 0);
-        VisitedPositions = new();
+        VisitedPositions = new() { TailPosition };
     }
 
     public void MoveHead(Vector2 instruction)
