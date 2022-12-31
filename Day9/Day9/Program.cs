@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using System.IO;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Day9;
 
@@ -20,7 +21,7 @@ public class Program
         foreach(string str in inputStrings)
         {
             char direction = str.ToCharArray()[0];
-            int magnitude = str.ToCharArray()[2];
+            int magnitude = Int32.Parse(str.Split(" ")[1]);
 
             instructions.Add(new Vector2(direction, magnitude));
         }
@@ -73,7 +74,7 @@ public class Knot
     }
 }
 
-public struct Vector2
+public class Vector2
 {
     public int X { get; set; }
     public int Y { get; set; }
@@ -83,7 +84,6 @@ public struct Vector2
         X = x;
         Y = y;
     }
-
     public Vector2(char direction, int magnitude)
     {
         if (direction == 'U') { X = 0; Y = magnitude; }
@@ -91,7 +91,11 @@ public struct Vector2
         else if (direction == 'R') { X = magnitude; Y = 0; }
         else { X = -magnitude; Y = 0; }
     }
-
+    public int Size()
+    {
+        //return whichever dimension is bigger as a positive int
+        return Math.Abs(this.X) > Math.Abs(this.Y) ? Math.Abs(this.X) : Math.Abs(this.Y);
+    }
     public static Vector2 operator +(Vector2 a, Vector2 b)
     {
         return new Vector2(a.X + b.X, a.Y + b.Y);
@@ -101,9 +105,17 @@ public struct Vector2
         return new Vector2(a.X - b.X, a.Y - b.Y);
     }
 
-    public int Size()
+    public override bool Equals(object? obj)
     {
-        //return whichever dimension is bigger as a positive int
-        return Math.Abs(this.X) > Math.Abs(this.Y) ? Math.Abs(this.X) : Math.Abs(this.Y);
+        Vector2? v = obj as Vector2;
+        return v is not null && this.X == v.X && this.Y == v.Y;
+    }
+    public override int GetHashCode()
+    {
+        return this.X.GetHashCode() ^ this.Y.GetHashCode();
+    }
+    public override string ToString()
+    {
+        return $"[{this.X},{this.Y}]";
     }
 }
