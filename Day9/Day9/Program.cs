@@ -8,12 +8,13 @@ public class Program
 {
     static void Main(string[] args)
     {
-        Console.WriteLine(Part1());   
+        Console.WriteLine(SizeOfRopeTailPath(1));
+        Console.WriteLine(SizeOfRopeTailPath(9));
     }
 
-    public static int Part1()
+    public static int SizeOfRopeTailPath(int ropeSize)
     {
-        Knot knot = new();
+        Knot knot = new(ropeSize);
         List<Vector2> instructions = new();
 
         string[] inputStrings = File.ReadAllLines("input.txt");
@@ -42,35 +43,44 @@ public class Program
 
 public class Knot
 {
+    private Vector2[] _tailPositions;
     public Vector2 HeadPosition { get; set; }
-    public Vector2 TailPosition { get; set; }
-
     public HashSet<Vector2> VisitedPositions { get; }
 
-    public Knot()
+    public Knot(int numberOfTails)
     {
         HeadPosition = new Vector2(0, 0);
-        TailPosition = new Vector2(0, 0);
-        VisitedPositions = new() { TailPosition };
+        _tailPositions = new Vector2[numberOfTails];
+        for(int i = 0; i < numberOfTails; i++)
+        {
+            _tailPositions[i] = new Vector2(0, 0);
+        }
+        VisitedPositions = new() { new(0, 0) };        
     }
-
     public void MoveHead(Vector2 instruction)
     {
         HeadPosition += instruction;
-        while((HeadPosition - TailPosition).Size() > 1)
+        if((HeadPosition - _tailPositions[0]).Size() > 1)
         {
-            UpdateTail();
+            UpdateTails();
         }
     }
-
-    private void UpdateTail()
+    private void UpdateTails()
     {
-        Vector2 distance = HeadPosition - TailPosition;
-        Vector2 increment = new(Math.Sign(distance.X), Math.Sign(distance.Y));
+        for(int i = 0; i < _tailPositions.Length; i++)
+        {
+            Vector2 parentPosition = i == 0 ? HeadPosition : _tailPositions[i - 1];
+            Vector2 distance = parentPosition - _tailPositions[i];
 
-        TailPosition += increment;
+            while (distance.Size() > 1)
+            {
+                Vector2 increment = new(Math.Sign(distance.X), Math.Sign(distance.Y));
+                _tailPositions[i] += increment;
+                distance = parentPosition - _tailPositions[i];
 
-        VisitedPositions.Add(TailPosition);
+                if (i == _tailPositions.Length - 1) VisitedPositions.Add(_tailPositions[i]);
+            } 
+        }
     }
 }
 
