@@ -59,11 +59,17 @@ public class Knot
     }
     public void MoveHead(Vector2 instruction)
     {
-        HeadPosition += instruction;
-        if((HeadPosition - _tailPositions[0]).Size() > 1)
+        Vector2 remainingInstruction = new(instruction.X, instruction.Y);
+        while (!remainingInstruction.IsZero())
         {
-            UpdateTails();
-        }
+            Vector2 increment = new(Math.Sign(remainingInstruction.X), Math.Sign(remainingInstruction.Y));
+            HeadPosition += increment;
+            if ((HeadPosition - _tailPositions[0]).Size() > 1)
+            {
+                UpdateTails();
+            }
+            remainingInstruction -= increment;
+        }        
     }
     private void UpdateTails()
     {
@@ -115,6 +121,10 @@ public class Vector2
         return new Vector2(a.X - b.X, a.Y - b.Y);
     }
 
+    public bool IsZero()
+    {
+        return this.X == 0 && this.Y == 0;
+    }
     public override bool Equals(object? obj)
     {
         Vector2? v = obj as Vector2;
