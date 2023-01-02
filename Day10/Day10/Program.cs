@@ -17,14 +17,17 @@ public class Program
             220
         };
 
-        int[] checkedCycles = ValuesOfRegisterAfterSeriesOfCycles(importantCycles, inputStrings);
+        //Part 1
+        //int[] checkedCycles = ValuesOfRegisterAfterSeriesOfCycles(importantCycles, inputStrings);
 
-        int sum = 0;
-        foreach(int i in checkedCycles)
-        {
-            sum += i;
-        }
-        Console.WriteLine(sum);
+        //int sum = 0;
+        //foreach(int i in checkedCycles)
+        //{
+        //    sum += i;
+        //}
+        //Console.WriteLine(sum);
+
+        Render(inputStrings);
     }
     public static int[] ValuesOfRegisterAfterSeriesOfCycles(int[] checkCycles, string[] inputStrings)
     {
@@ -43,7 +46,8 @@ public class Program
 
             for(int i = 0; i < cyclesToAdd; i++)
             {
-                if(cycles == nextCheck)
+                cycles++;
+                if (cycles == nextCheck)
                 {
                     output[checkIndex] = registerValue * nextCheck;
                     checkIndex++;
@@ -53,11 +57,40 @@ public class Program
                     }
                     nextCheck = checkCycles[checkIndex];
                 }
-                cycles++;
             }
             registerValue += queuedValue;
         }
         return output;
+    }
+
+    public static void Render(string[] inputStrings)
+    {
+        List<Instruction> listOfInstructions = ParseStringsToInstructions(inputStrings);
+        int registerValue = 1;
+        int currentPixel = 0;
+
+        foreach (Instruction instruction in listOfInstructions)
+        {
+            int cyclesToAdd = instruction.Type == InstructionType.NOOP ? 1 : 2;
+            int queuedValue = instruction.Value;
+
+            for (int i = 0; i < cyclesToAdd; i++)
+            {
+                if (currentPixel % 40 == 0)
+                {
+                    Console.Write("\n");
+                    currentPixel = 0;
+                }
+
+                if (Math.Abs(currentPixel - registerValue) <= 1)
+                {
+                    Console.Write("#");
+                }
+                else Console.Write('.');
+                currentPixel++;
+            }
+            registerValue += queuedValue;
+        }
     }
 
     public static List<Instruction> ParseStringsToInstructions(string[] inputStrings)
