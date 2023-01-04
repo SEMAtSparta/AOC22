@@ -89,7 +89,6 @@ public class Knot
         }
     }
 }
-
 public class Vector2
 {
     public int X { get; set; }

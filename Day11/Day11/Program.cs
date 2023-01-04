@@ -4,203 +4,219 @@ public class Program
 {
     static void Main(string[] args)
     {
-        List<Monkey> monkeyList = MonkeySetup();
+        List<Monkey> monkeyListPart1 = MonkeySetup(true);
+        List<Monkey> monkeyListPart2 = MonkeySetup(false);
 
-        int rounds = 10_000;
+        //Console.WriteLine(RunSimulation(monkeyListPart1, 20));  
+        Console.WriteLine(RunSimulation(monkeyListPart2, 10_000));  
+    }
 
-        for(int i = 0; i < rounds; i++)
+    public static long RunSimulation(List<Monkey> monkeys, int rounds)
+    {
+
+        for (int i = 0; i < rounds; i++)
         {
-            foreach (Monkey monkey in monkeyList)
+            foreach (Monkey monkey in monkeys)
             {
                 monkey.InspectAll();
             }
         }
 
-        long largest = 0, second = 0;
-
-        foreach(Monkey monkey in monkeyList)
+        long[] mostInspections = new long[2];
+        foreach (Monkey monkey in monkeys)
         {
-            if(monkey.NumberOfInspectedItems > second)
+            if (monkey.NumberOfInspectedItems > mostInspections[1])
             {
-                if(monkey.NumberOfInspectedItems > largest)
+                if (monkey.NumberOfInspectedItems > mostInspections[0])
                 {
-                    largest = monkey.NumberOfInspectedItems;
+                    mostInspections[0] = monkey.NumberOfInspectedItems;
                 }
                 else
                 {
-                    second = monkey.NumberOfInspectedItems;
+                    mostInspections[1] = monkey.NumberOfInspectedItems;
                 }
             }
         }
 
-        Console.WriteLine(largest * second);
+        return mostInspections[0] * mostInspections[1];
     }
 
-    public static List<Monkey> MonkeySetup()
+    public static List<Monkey> MonkeySetup(bool part1)
     {
-        MonkeyTest monkey0Test = (int item) => item % 3 == 0;
-        MonkeyOperation monkey0Operation = (int item) => item * 17;
+        int[] testPrimes = { 3, 13, 2, 11, 19, 17, 5, 7 };
 
-        MonkeyTest monkey1Test = (int item) => item % 13 == 0;
-        MonkeyOperation monkey1Operation = (int item) => item + 2;
+        List<MonkeyOperation> monkeyOperations = SetMonkeyOperations();
+        List<MonkeyTest> monkeyTests = SetMonkeyTests(testPrimes);
+        List<Monkey> monkeys = CreateMonkeys(monkeyOperations, monkeyTests, part1);
 
-        MonkeyTest monkey2Test = (int item) => item % 2 == 0;
-        MonkeyOperation monkey2Operation = (int item) => item + 1;
+        SetMonkeyLCM(testPrimes, monkeys);
+        SetMonkeyTargets(monkeys);
+        SetMonkeyItems(monkeys);
 
-        MonkeyTest monkey3Test = (int item) => item % 11 == 0;
-        MonkeyOperation monkey3Operation = (int item) => item + 7;
+        return monkeys;
+    }
 
-        MonkeyTest monkey4Test = (int item) => item % 19 == 0;
-        MonkeyOperation monkey4Operation = (int item) => item * item;
+    public static List<Monkey> CreateMonkeys(List<MonkeyOperation> monkeyOperations, List<MonkeyTest> monkeyTests, bool part1)
+    {
+        List<Monkey> monkeys = new();
 
-        MonkeyTest monkey5Test = (int item) => item % 17 == 0;
-        MonkeyOperation monkey5Operation = (int item) => item + 8;
-
-        MonkeyTest monkey6Test = (int item) => item % 5 == 0;
-        MonkeyOperation monkey6Operation = (int item) => item * 2;
-
-        MonkeyTest monkey7Test = (int item) => item % 7 == 0;
-        MonkeyOperation monkey7Operation = (int item) => item + 6;
-
-        List<Monkey> monkeyList = new();
-
-        Monkey monkey0 = new(0, monkey0Operation, monkey0Test);
-        Monkey monkey1 = new(1, monkey1Operation, monkey1Test);
-        Monkey monkey2 = new(2, monkey2Operation, monkey2Test);
-        Monkey monkey3 = new(3, monkey3Operation, monkey3Test);
-        Monkey monkey4 = new(4, monkey4Operation, monkey4Test);
-        Monkey monkey5 = new(5, monkey5Operation, monkey5Test);
-        Monkey monkey6 = new(6, monkey6Operation, monkey6Test);
-        Monkey monkey7 = new(7, monkey7Operation, monkey7Test);
-
-        foreach (int item in new int[] { 59, 65, 86, 56, 74, 57, 56 })
+        for (int i = 0; i < monkeyOperations.Count; i++)
         {
-            monkey0.AddItem(item);
-        }
-        foreach (int item in new int[] { 63, 83, 50, 63, 56 })
-        {
-            monkey1.AddItem(item);
-        }
-        foreach (int item in new int[] { 93, 79, 74, 55 })
-        {
-            monkey2.AddItem(item);
-        }
-        foreach (int item in new int[] { 86, 61, 67, 88, 94, 69, 56, 91 })
-        {
-            monkey3.AddItem(item);
-        }
-        foreach (int item in new int[] { 76, 50, 51 })
-        {
-            monkey4.AddItem(item);
-        }
-        foreach (int item in new int[] { 77, 76 })
-        {
-            monkey5.AddItem(item);
-        }
-        foreach (int item in new int[] { 74 })
-        {
-            monkey6.AddItem(item);
-        }
-        foreach (int item in new int[] { 86, 85, 52, 86, 91, 95 })
-        {
-            monkey7.AddItem(item);
+            monkeys.Add(new Monkey(i, monkeyOperations[i], monkeyTests[i], part1));
         }
 
-        monkey0.SetTargets(monkey3, monkey6);
-        monkey1.SetTargets(monkey3, monkey0);
-        monkey2.SetTargets(monkey0, monkey1);
-        monkey3.SetTargets(monkey6, monkey7);
-        monkey4.SetTargets(monkey2, monkey5);
-        monkey5.SetTargets(monkey2, monkey1);
-        monkey6.SetTargets(monkey4, monkey7);
-        monkey7.SetTargets(monkey4, monkey5);
+        return monkeys;
+    }
 
-        monkeyList.Add(monkey0);
-        monkeyList.Add(monkey1);
-        monkeyList.Add(monkey2);
-        monkeyList.Add(monkey3);
-        monkeyList.Add(monkey4);
-        monkeyList.Add(monkey5);
-        monkeyList.Add(monkey6);
-        monkeyList.Add(monkey7);
+    public static void SetMonkeyTargets(List<Monkey> monkeys)
+    {
+        monkeys[0].SetTargets(monkeys[3], monkeys[6]);
+        monkeys[1].SetTargets(monkeys[3], monkeys[0]);
+        monkeys[2].SetTargets(monkeys[0], monkeys[1]);
+        monkeys[3].SetTargets(monkeys[6], monkeys[7]);
+        monkeys[4].SetTargets(monkeys[2], monkeys[5]);
+        monkeys[5].SetTargets(monkeys[2], monkeys[1]);
+        monkeys[6].SetTargets(monkeys[4], monkeys[7]);
+        monkeys[7].SetTargets(monkeys[4], monkeys[5]);
+    }
+
+    public static List<MonkeyTest> SetMonkeyTests(int[] testPrimes)
+    {
+        List<MonkeyTest> monkeyTests = new();
         
-        return monkeyList;
+
+        foreach (int prime in testPrimes)
+        {
+            monkeyTests.Add((long item) => item % prime == 0);
+        }
+
+        return monkeyTests;
+    }
+    public static List<MonkeyOperation> SetMonkeyOperations()
+    {
+        List<MonkeyOperation> monkeyOperations = new();
+
+        monkeyOperations.Add((long item) => item * 17);
+        monkeyOperations.Add((long item) => item + 2);
+        monkeyOperations.Add((long item) => item + 1);
+        monkeyOperations.Add((long item) => item + 7);
+        monkeyOperations.Add((long item) => item * item);
+        monkeyOperations.Add((long item) => item + 8);
+        monkeyOperations.Add((long item) => item * 2);
+        monkeyOperations.Add((long item) => item + 6);
+
+        return monkeyOperations;
+    }
+
+    public static void SetMonkeyItems(List<Monkey> monkeys)
+    {
+        List<long[]> itemArrays = new()
+        {
+            new long[] { 59, 65, 86, 56, 74, 57, 56 },
+            new long[] { 63, 83, 50, 63, 56 },
+            new long[] { 93, 79, 74, 55 },
+            new long[] { 86, 61, 67, 88, 94, 69, 56, 91 },
+            new long[] { 76, 50, 51 },
+            new long[] { 77, 76 },
+            new long[] { 74 },
+            new long[] { 86, 85, 52, 86, 91, 95 }
+        };
+
+        for(int i = 0; i < monkeys.Count; i++)
+        {
+            monkeys[i].AddItem(itemArrays[i]);
+        }
+    }
+
+    public static void SetMonkeyLCM(int[] primes, List<Monkey> monkeys)
+    {
+        int lcm = 1;
+        foreach (int num in primes)
+        {
+            lcm *= num;
+        }
+        foreach (Monkey monkey in monkeys)
+        {
+            monkey.LCM = lcm;
+        }
     }
 }
 
-public delegate int MonkeyOperation(int item);
-public delegate bool MonkeyTest(int item);
+public delegate long MonkeyOperation(long item);
+public delegate bool MonkeyTest(long item);
 
 public class Monkey
 {
     private MonkeyOperation _operation;
     private MonkeyTest _test;
-    private Monkey[] _targets;
-    private Queue<int> _heldItems;
+    private (Monkey firstTarget, Monkey secondTarget) _targets;
+    private List<long> _heldItems;
+    private bool _part1;
 
     public int Identifier { get; }
+    public int LCM { get; set; }
     public long NumberOfInspectedItems { get; set; }
 
     public void InspectAll()
     {
-        while(_heldItems.Any())
+        long[] itemsTemp = _heldItems.ToArray();
+        _heldItems.Clear();
+        foreach(int item in itemsTemp)
         {
-            int item = _heldItems.Dequeue();
             Inspect(item);
         }
     }
-
-    public void Inspect(int item)
+    public void Inspect(long item)
     {
-        int adjustedItemValue = Operate(item);
-        //bool test = Test(adjustedItemValue, out adjustedItemValue);
-        bool test = Test(adjustedItemValue);
-        if (test) Throw(adjustedItemValue, _targets[0]);
-        else Throw(adjustedItemValue, _targets[1]);
+        long adjustedItemValue = Operate(item);
+        Test(adjustedItemValue);
         NumberOfInspectedItems++;
     }
-
-    public int Operate(int item)
+    public long Operate(long item)
     {
         long newItemValue = _operation(item);
-        int output = (int) newItemValue % 9_699_690;
-        return output;
+
+        if (_part1) return newItemValue / 3;
+        //9699690 is the lcm of every monkey's test value
+        else return newItemValue % LCM;
     }
-
-    //part 1 test
-    //public bool Test(int item, out int newItemValue)
-    //{
-    //    newItemValue = item / 3;
-    //    return _test(newItemValue);
-    //}
-
-    //part 2 test
-    public bool Test(int item)
+    public void Test(long item)
     {
-        bool test = _test(item);
-
-        return test;
+        if (_test(item)) Throw(item, _targets.firstTarget);
+        else Throw(item, _targets.secondTarget);
     }
-    public void AddItem(int item)
+    public void AddItem(long item)
     {
-        _heldItems.Enqueue(item);
+        _heldItems.Add(item);
     }
-    public void Throw(int item, Monkey target)
+    public void AddItem(long[] itemArray)
+    {
+        foreach(long item in itemArray)
+        {
+            AddItem(item);
+        }
+    }
+    public void Throw(long item, Monkey target)
     {
         target.AddItem(item);
     }
-    public Monkey(int identifier, MonkeyOperation operation, MonkeyTest test)
+    public Monkey(int identifier, MonkeyOperation operation, MonkeyTest test, bool part1)
     {
+        _part1 = part1;
         _test = test;
         _operation = operation;
         _heldItems = new();
         Identifier = identifier;
-        _targets = new Monkey[2];
     }
     
     public void SetTargets(Monkey target1, Monkey target2)
     {
-        _targets[0] = target1;
-        _targets[1] = target2;
+        _targets.firstTarget = target1;
+        _targets.secondTarget = target2;
+    }
+
+    public override string ToString()
+    {
+        return $"Monkey {Identifier}";
     }
 }
